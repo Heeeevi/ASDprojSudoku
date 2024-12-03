@@ -3,7 +3,7 @@
  * Semester Ganjil, 2024/2025
  * Group Capstone Project
  * Group #1
- * 1 - 5026231102 - Ahmed Miftag Ghifari
+ * 1 - 5026231102 - Ahmed Miftah Ghifari
  * 2 - 5026231103 - Eric Vincentius Jaolis
  * 3 - 5026231156 - Hafiyyuddin Ahmad
  */
@@ -113,7 +113,6 @@ public class GameBoardPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             // Get a reference of the JTextField that triggers this action event
             Cell sourceCell = (Cell) e.getSource();
-
             // Retrieve the int entered
             int numberIn = Integer.parseInt(sourceCell.getText());
             // For debugging
