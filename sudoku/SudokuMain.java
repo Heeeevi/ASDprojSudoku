@@ -7,7 +7,7 @@
  * 2 - 5026231103 - Eric Vincentius Jaolis
  * 3 - 5026231156 - Hafiyyuddin Ahmad
  */
-
+// job to be done button reset, yg bolong banyakin aka random, difficulty, timer, status bar (number off cells remaining), Sound Effect Oiiiaoiia waktu menang
 package sudoku;
 import java.awt.*;
 import javax.swing.*;
