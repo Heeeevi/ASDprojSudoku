@@ -10,7 +10,7 @@
 
 /* Conducted to add additonal features for Group wan entreprise sudoku that consist of :
 * - Menu Bar (Reset, New Game, About  Game
-* - Status Bar*/
+* - Status Bar, sori yg automatic generator susah banget :( besok dulu */
 
 package sudoku;
 
