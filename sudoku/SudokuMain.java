@@ -7,6 +7,7 @@
  * 2 - 5026231103 - Eric Vincentius Jaolis
  * 3 - 5026231156 - Hafiyyuddin Ahmad
  */
+
 // job to be done button reset, yg bolong banyakin aka random, difficulty, timer, status bar (number off cells remaining), Sound Effect Oiiiaoiia waktu menang
 package sudoku;
 import java.awt.*;
@@ -19,6 +20,8 @@ public class SudokuMain extends JFrame {
 
     // private variables
     GameBoardPanel board = new GameBoardPanel();
+    SudokuExtras extras = new SudokuExtras(this);
+
     JButton btnNewGame = new JButton("New Game");
 
     // Constructor
