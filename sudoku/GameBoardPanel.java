@@ -15,6 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameBoardPanel extends JPanel {
 
@@ -23,6 +25,9 @@ public class GameBoardPanel extends JPanel {
     private static final int SUBGRID_SIZE = 3;
 
     private Cell[][] cells;
+
+    private Timer timer;
+    private int elapsedSeconds;
 
     public GameBoardPanel() {
         setLayout(new GridLayout(GRID_SIZE, GRID_SIZE));
@@ -52,8 +57,41 @@ public class GameBoardPanel extends JPanel {
                 cells[row][col].setEditable(puzzle[row][col] == 0);
             }
         }
+        resetTimer();
+    }
+    public void startTimer(JLabel timerLabel) {
+        resetTimer();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                elapsedSeconds++;
+                int minutes = elapsedSeconds / 60;
+                int seconds = elapsedSeconds % 60;
+                timerLabel.setText(String.format("Time: %02d:%02d", minutes, seconds));
+            }
+        }, 0, 1000);
+    }
+    private void resetTimer() {
+        if (timer != null) {
+            timer.cancel();
+        }
+        elapsedSeconds = 0;
     }
 
+    public void updateProgress(JProgressBar progressBar) {
+        int filledCells = 0;
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                if (!cells[row][col].getText().isEmpty()) {
+                    filledCells++;
+                }
+            }
+        }
+        int totalCells = GRID_SIZE * GRID_SIZE;
+        int progress = (filledCells * 100) / totalCells;
+        progressBar.setValue(progress);
+    }
     /**
      * Mendapatkan cell tertentu berdasarkan baris dan kolom
      * @param row indeks baris
@@ -114,4 +152,5 @@ public class GameBoardPanel extends JPanel {
         }
         throw new IllegalArgumentException("Invalid difficulty level: " + difficulty);
     }
+
 }
