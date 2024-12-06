@@ -15,8 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Timer;
 
 public class GameBoardPanel extends JPanel {
 
@@ -28,6 +28,7 @@ public class GameBoardPanel extends JPanel {
 
     private Timer timer;
     private int elapsedSeconds;
+    private boolean timerOn = false;
 
     public GameBoardPanel() {
         setLayout(new GridLayout(GRID_SIZE, GRID_SIZE));
@@ -59,24 +60,37 @@ public class GameBoardPanel extends JPanel {
         }
         resetTimer();
     }
-    public void startTimer(JLabel timerLabel) {
+    public void startTimer(JLabel timerLabel) { 
         resetTimer();
         timer = new Timer();
+        timerOn = true;
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                elapsedSeconds++;
-                int minutes = elapsedSeconds / 60;
-                int seconds = elapsedSeconds % 60;
-                timerLabel.setText(String.format("Time: %02d:%02d", minutes, seconds));
+                if (timerOn) {
+                    elapsedSeconds++;
+                    int minutes = elapsedSeconds / 60;
+                    int seconds = elapsedSeconds % 60;
+                    SwingUtilities.invokeLater(() -> timerLabel.setText(String.format("Time: %02d:%02d", minutes, seconds)));
+                }
             }
-        }, 0, 1000);
+        }, 1000, 1000);
+    }
+    public void pauseTimer() {
+        timerOn = false;
+    }
+    public void resumeTimer() {
+        timerOn = true;
+    }
+    public boolean isTimerOn() {
+        return timerOn;
     }
     private void resetTimer() {
         if (timer != null) {
             timer.cancel();
         }
         elapsedSeconds = 0;
+        timerOn = false;
     }
 
     public void updateProgress(JProgressBar progressBar) {
