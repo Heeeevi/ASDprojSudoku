@@ -67,6 +67,17 @@ public class SudokuMain {
             // Menambahkan listener untuk tombol solve (placeholder)
             solveButton.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Solve functionality not implemented yet."));
 
+            // Menambahkan listener untuk tombol pause
+            pauseButton.addActionListener(e -> {
+                if (gameBoardPanel.isTimerOn()) {
+                    gameBoardPanel.pauseTimer();
+                    pauseButton.setText("Resume");
+                } else {
+                    gameBoardPanel.resumeTimer();
+                    pauseButton.setText("Pause");
+                }
+            });
+
             // Menambahkan main panel ke frame
             frame.add(mainPanel);
             frame.pack();
