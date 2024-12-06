@@ -166,4 +166,65 @@ public class SudokuExtras {
         currentCell.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
         currentCell.requestFocus();
     }
+
+    // Menambahkan validasi untuk tombol Solve
+    public void validateAndSolve() {
+        boolean isValid = true;
+
+        // Iterasi melalui semua sel di board untuk memeriksa validitas
+        for (int row = 0; row < SudokuConstants.GRID_SIZE; row++) {
+            for (int col = 0; col < SudokuConstants.GRID_SIZE; col++) {
+                Cell cell = gameBoardPanel.getCell(row, col);
+                try {
+                    int value = Integer.parseInt(cell.getText());
+
+                    // Jika nilai tidak valid, beri warna merah
+                    if (!isValidNumber(value, row, col)) {
+                        cell.setBackground(Color.RED);
+                    } else {
+                        // Jika nilai valid, beri warna hijau
+                        cell.setBackground(Color.GREEN);
+                    }
+                } catch (NumberFormatException ex) {
+                    // Jika cell kosong atau tidak dapat diubah menjadi angka
+                    cell.setBackground(Color.WHITE);  // Set ke warna default jika kosong
+                }
+                // Repaint untuk memastikan perubahan diterapkan
+                cell.repaint();
+            }
+        }
+
+        // Update status bar sesuai dengan hasil
+        updateStatus(isValid ? "Sudoku Solved!" : "Some cells are incorrect. Try again!");
+    }
+
+    // Memeriksa apakah angka di baris, kolom, dan subgrid 3x3 valid
+    private boolean isValidNumber(int value, int row, int col) {
+        // Cek baris
+        for (int i = 0; i < SudokuConstants.GRID_SIZE; i++) {
+            if (i != col && Integer.parseInt(gameBoardPanel.getCell(row, i).getText()) == value) {
+                return false;
+            }
+        }
+
+        // Cek kolom
+        for (int i = 0; i < SudokuConstants.GRID_SIZE; i++) {
+            if (i != row && Integer.parseInt(gameBoardPanel.getCell(i, col).getText()) == value) {
+                return false;
+            }
+        }
+
+        // Cek subgrid 3x3
+        int startRow = (row / 3) * 3;
+        int startCol = (col / 3) * 3;
+        for (int i = startRow; i < startRow + 3; i++) {
+            for (int j = startCol; j < startCol + 3; j++) {
+                if (i != row && j != col && Integer.parseInt(gameBoardPanel.getCell(i, j).getText()) == value) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }
