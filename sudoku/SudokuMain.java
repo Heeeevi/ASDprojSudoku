@@ -62,6 +62,8 @@ public class SudokuMain {
                 gameBoardPanel.newGame(selectedDifficulty);
                 gameBoardPanel.startTimer(timerLabel);
                 gameBoardPanel.updateProgress(progressBar);
+                Audio.MUSIC.stop();
+                Audio.MUSIC.music();
             });
 
             // Menambahkan listener untuk tombol solve (placeholder)
@@ -91,6 +93,7 @@ public class SudokuMain {
             gameBoardPanel.startTimer(timerLabel);
             gameBoardPanel.updateProgress(progressBar);
             Audio.MUSIC.music();
+
         });
     }
 }

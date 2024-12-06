@@ -244,7 +244,42 @@ public class GameBoardPanel extends JPanel {
             }
             sourceCell.paint();   // re-paint this cell based on its status
 
-//            if(isSolved())JOptionPane.showMessageDialog(null, "Congratulation!");
+            if(isSolved()) {
+                showWinDialog();
+            }
         }
+    }
+    public void showWinDialog() {
+        Audio.MUSIC.stop();
+        // Play the audio
+        Audio.WIN.music();
+
+        // Create a panel to hold the custom components
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        // Create a label for the congratulations text with a larger font
+        JLabel textLabel = new JLabel("Congratulations!", JLabel.CENTER);
+        textLabel.setFont(new Font("Kiana", Font.BOLD, 24)); // Adjust font size as needed
+        textLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // Load the image
+        ImageIcon imageIcon = new ImageIcon("image/oiia.gif"); // Replace with the correct path
+
+        // Create a label for the image
+        JLabel imageLabel = new JLabel(imageIcon);
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // Add text and image to the panel
+        panel.add(textLabel, BorderLayout.NORTH); // Text on top
+        panel.add(imageLabel, BorderLayout.CENTER); // Image below
+
+        // Display the custom panel in a JOptionPane
+        JOptionPane.showMessageDialog(
+                null,
+                panel,
+                "Winner",
+                JOptionPane.PLAIN_MESSAGE
+        );
     }
 }

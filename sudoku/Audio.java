@@ -22,7 +22,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 public enum Audio {
     CLICK("audio/BFD.wav"),
     MUSIC("audio/BGM.wav"),
-    DIE("audio/BFD.wav");
+    WIN("audio/oiia.wav");
 
     /** Nested enumeration for specifying volume */
     public static enum Volume {
@@ -68,7 +68,12 @@ public enum Audio {
             if (clip.isRunning())
                 clip.stop();   // Stop the player if it is still running
             clip.setFramePosition(0); // rewind to the beginning
-            clip.loop(3);   // Start playing
+            clip.loop(5);   // Start playing
+        }
+    }
+    public void stop() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
         }
     }
 
