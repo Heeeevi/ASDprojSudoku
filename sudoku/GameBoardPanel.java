@@ -15,8 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.TimerTask;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameBoardPanel extends JPanel {
 
@@ -40,9 +40,29 @@ public class GameBoardPanel extends JPanel {
                 add(cells[row][col]);
             }
         }
+        CellInputListener listener = new CellInputListener();
+
+        for (int row=0;row<SudokuConstants.GRID_SIZE;row++) {
+            for (int col=0;col<SudokuConstants.GRID_SIZE;col++) {
+                if (cells[row][col].isEditable()) {
+                    cells[row][col].addActionListener(listener);   // For all editable rows and cols
+                }
+            }
+        }
 
         setPreferredSize(new Dimension(450, 450));
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    }
+
+    public boolean isSolved() {
+        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
+            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+                if (cells[row][col].status == CellStatus.TO_GUESS || cells[row][col].status == CellStatus.WRONG_GUESS) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -50,17 +70,25 @@ public class GameBoardPanel extends JPanel {
      * @param difficulty tingkat kesulitan (easy, medium, hard)
      */
     public void newGame(String difficulty) {
-        int[][] puzzle = generatePuzzle(difficulty);
+        Puzzle puzzle = new Puzzle();
+        int guessAmount = 0;
+        if(difficulty.equalsIgnoreCase("easy")) guessAmount = 10;
+        else if(difficulty.equalsIgnoreCase("medium")) guessAmount = 20;
+        else guessAmount = 30;
 
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
-                cells[row][col].setValue(puzzle[row][col]);
-                cells[row][col].setEditable(puzzle[row][col] == 0);
+        // Generate a new puzzle
+        puzzle.newPuzzle(guessAmount);
+        System.out.println(guessAmount);
+
+        // Initialize all the 9x9 cells, based on the puzzle.
+        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
+            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+                cells[row][col].newGame(puzzle.numbers[row][col], puzzle.isGiven[row][col]);
             }
         }
         resetTimer();
     }
-    public void startTimer(JLabel timerLabel) { 
+    public void startTimer(JLabel timerLabel) {
         resetTimer();
         timer = new Timer();
         timerOn = true;
@@ -76,6 +104,7 @@ public class GameBoardPanel extends JPanel {
             }
         }, 1000, 1000);
     }
+
     public void pauseTimer() {
         timerOn = false;
     }
@@ -85,6 +114,7 @@ public class GameBoardPanel extends JPanel {
     public boolean isTimerOn() {
         return timerOn;
     }
+
     private void resetTimer() {
         if (timer != null) {
             timer.cancel();
@@ -167,4 +197,54 @@ public class GameBoardPanel extends JPanel {
         throw new IllegalArgumentException("Invalid difficulty level: " + difficulty);
     }
 
+    private class CellInputListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Cell sourceCell = (Cell)e.getSource();
+
+            int numberIn = Integer.parseInt(sourceCell.getText());
+
+            for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
+                for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+                    if (cells[row][col].status == CellStatus.WRONG_GUESS) {
+                        if(cells[row][col].isEditable()) {
+                            cells[row][col].status = CellStatus.TO_GUESS;
+                            cells[row][col].paint();
+                        } else {
+                            cells[row][col].status = CellStatus.GIVEN;
+                            cells[row][col].paint();
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < SudokuConstants.GRID_SIZE; ++i) {
+                if(numberIn == cells[i][sourceCell.col].number) {
+                    cells[i][sourceCell.col].status = CellStatus.WRONG_GUESS;
+                    cells[i][sourceCell.col].paint();
+                }
+                else if(numberIn == cells[sourceCell.row][i].number) {
+                    cells[sourceCell.row][i].status = CellStatus.WRONG_GUESS;
+                    cells[sourceCell.row][i].paint();
+                }
+            }
+
+            for(int i=(sourceCell.row/3) * 3;i< (sourceCell.row/3) * 3 + 3;i++) {
+                for(int j=(sourceCell.col/3) * 3;j<(sourceCell.col/3) * 3 + 3;j++) {
+                    if(numberIn == cells[i][j].number) {
+                        cells[i][j].status = CellStatus.WRONG_GUESS;
+                        cells[i][j].paint();
+                    }
+                }
+            }
+
+            if(numberIn == sourceCell.number) {
+                sourceCell.status = CellStatus.CORRECT_GUESS;
+                sourceCell.paint();
+            }
+            sourceCell.paint();   // re-paint this cell based on its status
+
+//            if(isSolved())JOptionPane.showMessageDialog(null, "Congratulation!");
+        }
+    }
 }
