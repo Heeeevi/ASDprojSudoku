@@ -13,8 +13,8 @@ package sudoku;
  * The Sudoku number puzzle to be solved
  */
 public class Puzzle {
-    private int[][] board;
-    private boolean[][] isGiven;
+    int[][] board;
+    boolean[][] isGiven;
     int[][] numbers = new int[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
     // The clues - isGiven (no need to guess) or need to guess
     //boolean[][] isGiven = new boolean[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
@@ -53,8 +53,8 @@ public class Puzzle {
         // Need to use input parameter cellsToGuess!
         // Hardcoded for testing, only 2 cells of "8" is NOT GIVEN
         boolean[][] hardcodedIsGiven =
-                {{true, true, true, true, true, false, true, true, true},
-                        {true, true, true, true, true, true, true, true, false},
+                {{true, true, true, true, true, true, true, true, true},
+                        {true, true, true, true, true, true, true, true, true},
                         {true, true, true, true, true, true, true, true, true},
                         {true, true, true, true, true, true, true, true, true},
                         {true, true, true, true, true, true, true, true, true},
@@ -62,6 +62,12 @@ public class Puzzle {
                         {true, true, true, true, true, true, true, true, true},
                         {true, true, true, true, true, true, true, true, true},
                         {true, true, true, true, true, true, true, true, true}};
+
+        for(int i=0;i<cellsToGuess;i++) {
+            int row = (int) (Math.random() * hardcodedIsGiven.length);
+            int col = (int) (Math.random() * hardcodedIsGiven.length);
+            hardcodedIsGiven[row][col] = false;
+        }
 
         // Copy from hardcodedIsGiven into array "isGiven"
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {

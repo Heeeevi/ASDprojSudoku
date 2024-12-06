@@ -37,10 +37,21 @@ public class SudokuMain {
             JButton solveButton = new JButton("Solve");
             JComboBox<String> difficultyComboBox = new JComboBox<>(new String[]{"Easy", "Medium", "Hard"});
 
+            // Timer dan progressbar
+            JLabel timerLabel = new JLabel("Time: 00:00");
+            JProgressBar progressBar = new JProgressBar(0, 100);
+            progressBar.setStringPainted(true);
+
+            //Tombol pause
+            JButton pauseButton = new JButton("Pause");
+            extrasPanel.add(pauseButton);
+
             extrasPanel.add(new JLabel("Difficulty:"));
             extrasPanel.add(difficultyComboBox);
             extrasPanel.add(newGameButton);
             extrasPanel.add(solveButton);
+            extrasPanel.add(timerLabel);
+            extrasPanel.add(progressBar);
 
             // Menambahkan extrasPanel di bagian bawah (SOUTH)
             mainPanel.add(extrasPanel, BorderLayout.SOUTH);
@@ -49,10 +60,23 @@ public class SudokuMain {
             newGameButton.addActionListener(e -> {
                 String selectedDifficulty = (String) difficultyComboBox.getSelectedItem();
                 gameBoardPanel.newGame(selectedDifficulty);
+                gameBoardPanel.startTimer(timerLabel);
+                gameBoardPanel.updateProgress(progressBar);
             });
 
             // Menambahkan listener untuk tombol solve (placeholder)
             solveButton.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Solve functionality not implemented yet."));
+
+            // Menambahkan listener untuk tombol pause
+            pauseButton.addActionListener(e -> {
+                if (gameBoardPanel.isTimerOn()) {
+                    gameBoardPanel.pauseTimer();
+                    pauseButton.setText("Resume");
+                } else {
+                    gameBoardPanel.resumeTimer();
+                    pauseButton.setText("Pause");
+                }
+            });
 
             // Menambahkan main panel ke frame
             frame.add(mainPanel);
@@ -62,6 +86,8 @@ public class SudokuMain {
 
             // Inisialisasi dengan permainan baru
             gameBoardPanel.newGame("Easy");
+            gameBoardPanel.startTimer(timerLabel);
+            gameBoardPanel.updateProgress(progressBar);
         });
     }
 }
