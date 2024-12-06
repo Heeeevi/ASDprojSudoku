@@ -72,9 +72,11 @@ public class SudokuMain {
                 if (gameBoardPanel.isTimerOn()) {
                     gameBoardPanel.pauseTimer();
                     pauseButton.setText("Resume");
+                    Audio.CLICK.play();
                 } else {
                     gameBoardPanel.resumeTimer();
                     pauseButton.setText("Pause");
+                    Audio.CLICK.play();
                 }
             });
 
@@ -88,6 +90,7 @@ public class SudokuMain {
             gameBoardPanel.newGame("Easy");
             gameBoardPanel.startTimer(timerLabel);
             gameBoardPanel.updateProgress(progressBar);
+            Audio.MUSIC.music();
         });
     }
 }
