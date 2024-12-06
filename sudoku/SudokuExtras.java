@@ -16,52 +16,70 @@ package sudoku;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 
 public class SudokuExtras {
-    private final SudokuMain mainFrame;
-    private final JTextField statusBar;
 
-    public SudokuExtras(SudokuMain frame) {
+    private final JFrame mainFrame;  // Referensi ke JFrame
+    private final JTextField statusBar;
+    private final GameBoardPanel gameBoardPanel;
+
+    private int currentRow = 0;  // Baris yang dipilih
+    private int currentCol = 0;  // Kolom yang dipilih
+
+    public SudokuExtras(JFrame frame, GameBoardPanel gameBoardPanel) {
         this.mainFrame = frame;
+        this.gameBoardPanel = gameBoardPanel;
         this.statusBar = createStatusBar();
         mainFrame.getContentPane().add(statusBar, BorderLayout.SOUTH);
         mainFrame.setJMenuBar(createMenuBar());
+        enableMouselessControl(gameBoardPanel);
     }
 
-    // Create Menu Bar
+    // Membuat Menu Bar
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
-        // File Menu
+        // Menu Game
+        JMenu gameMenu = new JMenu("Game");
+        JMenuItem newEasy = new JMenuItem("New Easy Puzzle");
+        JMenuItem newMedium = new JMenuItem("New Medium Puzzle");
+        JMenuItem newHard = new JMenuItem("New Hard Puzzle");
+
+        newEasy.addActionListener(e -> {
+            gameBoardPanel.newGame("easy");
+            updateStatus("New Easy Puzzle started!");
+        });
+        newMedium.addActionListener(e -> {
+            gameBoardPanel.newGame("medium");
+            updateStatus("New Medium Puzzle started!");
+        });
+        newHard.addActionListener(e -> {
+            gameBoardPanel.newGame("hard");
+            updateStatus("New Hard Puzzle started!");
+        });
+
+        gameMenu.add(newEasy);
+        gameMenu.add(newMedium);
+        gameMenu.add(newHard);
+
+        // Menu File
         JMenu fileMenu = new JMenu("File");
-        JMenuItem newGameItem = new JMenuItem("New Game");
         JMenuItem resetGameItem = new JMenuItem("Reset Game");
         JMenuItem exitItem = new JMenuItem("Exit");
 
-        // Action Listeners for File Menu
-        newGameItem.addActionListener(e -> {
-            mainFrame.board.newGame();
-            updateStatus("Game Start!");
-        });
         resetGameItem.addActionListener(e -> {
-            mainFrame.board.newGame();
+            gameBoardPanel.newGame("medium"); // Default difficulty
             updateStatus("Game reset!");
         });
         exitItem.addActionListener(e -> System.exit(0));
 
-        fileMenu.add(newGameItem);
         fileMenu.add(resetGameItem);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
-        // Options Menu (Placeholder for future expansion)
-        JMenu optionsMenu = new JMenu("Options");
-        JMenuItem placeholderOption = new JMenuItem("Settings...");
-        optionsMenu.add(placeholderOption);
-
-        // Help Menu (Placeholder for future expansion)
+        // Menu Help
         JMenu helpMenu = new JMenu("Help");
         JMenuItem aboutItem = new JMenuItem("About");
         aboutItem.addActionListener(e -> JOptionPane.showMessageDialog(
@@ -70,17 +88,18 @@ public class SudokuExtras {
                 "About",
                 JOptionPane.INFORMATION_MESSAGE
         ));
+
         helpMenu.add(aboutItem);
 
-        // Add Menus to Menu Bar
+        // Menambahkan menu ke menu bar
+        menuBar.add(gameMenu);
         menuBar.add(fileMenu);
-        menuBar.add(optionsMenu);
         menuBar.add(helpMenu);
 
         return menuBar;
     }
 
-    // Create Status Bar
+    // Membuat Status Bar
     private JTextField createStatusBar() {
         JTextField statusBar = new JTextField("Okaeri nasai!");
         statusBar.setEditable(false);
@@ -89,8 +108,62 @@ public class SudokuExtras {
         return statusBar;
     }
 
-    // Update Status Bar Message
+    // Memperbarui pesan pada Status Bar
     public void updateStatus(String message) {
         statusBar.setText(message);
+    }
+
+    // Navigasi tanpa mouse
+    public void enableMouselessControl(GameBoardPanel board) {
+        board.setFocusable(true);
+
+        board.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_UP:
+                        if (currentRow > 0) currentRow--;
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        if (currentRow < SudokuConstants.GRID_SIZE - 1) currentRow++;
+                        break;
+                    case KeyEvent.VK_LEFT:
+                        if (currentCol > 0) currentCol--;
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        if (currentCol < SudokuConstants.GRID_SIZE - 1) currentCol++;
+                        break;
+                    default:
+                        break;
+                }
+                highlightCurrentCell(board);
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char keyChar = e.getKeyChar();
+                if (Character.isDigit(keyChar)) {
+                    int number = Character.getNumericValue(keyChar);
+                    Cell currentCell = board.getCell(currentRow, currentCol);
+                    if (currentCell.isEditable()) {
+                        currentCell.setText(String.valueOf(number));
+                        currentCell.repaint();
+                    }
+                }
+            }
+        });
+    }
+
+    private void highlightCurrentCell(GameBoardPanel board) {
+        for (int row = 0; row < SudokuConstants.GRID_SIZE; row++) {
+            for (int col = 0; col < SudokuConstants.GRID_SIZE; col++) {
+                Cell cell = board.getCell(row, col);
+                cell.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            }
+        }
+
+        Cell currentCell = board.getCell(currentRow, currentCol);
+        currentCell.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
+        currentCell.requestFocus();
     }
 }

@@ -13,15 +13,18 @@ package sudoku;
  * The Sudoku number puzzle to be solved
  */
 public class Puzzle {
-    // All variables have package access
-    // The numbers on the puzzle
+    private int[][] board;
+    private boolean[][] isGiven;
     int[][] numbers = new int[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
     // The clues - isGiven (no need to guess) or need to guess
-    boolean[][] isGiven = new boolean[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
+    //boolean[][] isGiven = new boolean[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
+
 
     // Constructor
     public Puzzle() {
         super();
+        board = new int[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
+        isGiven = new boolean[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
     }
 
     // Generate a new puzzle given the number of cells to be guessed, which can be used
@@ -67,6 +70,77 @@ public class Puzzle {
             }
         }
     }
+    public void generatePuzzle(String difficulty) {
+        // Step 1: Generate a full Sudoku board
+        generateFullBoard();
 
-    //(For advanced students) use singleton design pattern for this class
+        // Step 2: Determine the number of clues based on difficulty
+        int clues;
+        switch (difficulty.toLowerCase()) {
+            case "easy":
+                clues = 40;
+                break;
+            case "medium":
+                clues = 30;
+                break;
+            case "hard":
+                clues = 20;
+                break;
+            default:
+                clues = 30; // Default to medium
+        }
+
+        // Step 3: Remove numbers to create the puzzle
+        removeNumbers(clues);
+    }
+    private void generateFullBoard() {
+        // Backtracking algorithm to generate a full valid Sudoku board
+        fillBoard(0, 0);
+    }
+
+    private boolean fillBoard(int row, int col) {
+        if (row == SudokuConstants.GRID_SIZE) return true;
+        if (col == SudokuConstants.GRID_SIZE) return fillBoard(row + 1, 0);
+
+        for (int num = 1; num <= SudokuConstants.GRID_SIZE; num++) {
+            if (isSafeToPlace(row, col, num)) {
+                board[row][col] = num;
+                if (fillBoard(row, col + 1)) return true;
+                board[row][col] = 0; // Backtrack
+            }
+        }
+        return false;
+    }
+    private boolean isSafeToPlace(int row, int col, int num) {
+        for (int i = 0; i < SudokuConstants.GRID_SIZE; i++) {
+            if (board[row][i] == num || board[i][col] == num) return false;
+            if (board[row / SudokuConstants.SUBGRID_SIZE * SudokuConstants.SUBGRID_SIZE + i / SudokuConstants.SUBGRID_SIZE]
+                    [col / SudokuConstants.SUBGRID_SIZE * SudokuConstants.SUBGRID_SIZE + i % SudokuConstants.SUBGRID_SIZE] == num)
+                return false;
+        }
+        return true;
+    }private void removeNumbers(int clues) {
+        int totalCells = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE;
+        int cellsToRemove = totalCells - clues;
+
+        while (cellsToRemove > 0) {
+            int row = (int) (Math.random() * SudokuConstants.GRID_SIZE);
+            int col = (int) (Math.random() * SudokuConstants.GRID_SIZE);
+            if (board[row][col] != 0) {
+                board[row][col] = 0;
+                isGiven[row][col] = false;
+                cellsToRemove--;
+            }
+        }
+    }
+
+    public int[][] getBoard() {
+        return board;
+    }
+
+    public boolean[][] getIsGiven() {
+        return isGiven;
+    }
 }
+
+//(For advanced students) use singleton design pattern for this class

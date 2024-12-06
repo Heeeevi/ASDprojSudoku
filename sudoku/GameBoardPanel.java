@@ -10,117 +10,108 @@
 
 
 package sudoku;
-import java.awt.*;
-import java.awt.event.*;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+public class GameBoardPanel extends JPanel {
 
-public class GameBoardPanel extends JPanel{
     private static final long serialVersionUID = 1L;
+    private static final int GRID_SIZE = 9;
+    private static final int SUBGRID_SIZE = 3;
 
-    public static final int CELL_SIZE = 60;
-    public static final int BOARD_WIDTH = CELL_SIZE * SudokuConstants.GRID_SIZE;
-    public static final int BOARD_HEIGHT = CELL_SIZE * SudokuConstants.GRID_SIZE;
+    private Cell[][] cells;
 
-    // Define properties
-    /** The game board composes of 9x9 Cells (customized JTextFields) */
-    private Cell[][] cells = new Cell[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
-    /** It also contains a Puzzle with array numbers and isGiven */
-    private Puzzle puzzle = new Puzzle();
-
-    /** Constructor */
     public GameBoardPanel() {
-        super.setLayout(new GridLayout(SudokuConstants.GRID_SIZE, SudokuConstants.GRID_SIZE));  // JPanel
+        setLayout(new GridLayout(GRID_SIZE, GRID_SIZE));
+        cells = new Cell[GRID_SIZE][GRID_SIZE];
 
-        // Allocate the 2D array of Cell, and added into JPanel.
-        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
-            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
                 cells[row][col] = new Cell(row, col);
-                super.add(cells[row][col]);   // JPanel
+                add(cells[row][col]);
             }
         }
 
-        // [TODO 3] Allocate a common listener as the ActionEvent listener for all the
-        //  Cells (JTextFields)
-        // .........
-        CellInputListener listener = new CellInputListener();
-
-        // [TODO 4] Adds this common listener to all editable cells
-        // .........
-        for (int row=0;row<SudokuConstants.GRID_SIZE;row++) {
-            for (int col=0;col<SudokuConstants.GRID_SIZE;col++) {
-                if (cells[row][col].isEditable()) {
-                    cells[row][col].addActionListener(listener);   // For all editable rows and cols
-                }
-            }
-        }
-
-        super.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
+        setPreferredSize(new Dimension(450, 450));
+        setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
     /**
-     * Generate a new puzzle; and reset the game board of cells based on the puzzle.
-     * You can call this method to start a new game.
+     * Menginisialisasi papan baru berdasarkan tingkat kesulitan
+     * @param difficulty tingkat kesulitan (easy, medium, hard)
      */
-    public void newGame() {
-        // Generate a new puzzle
-        puzzle.newPuzzle(2);
+    public void newGame(String difficulty) {
+        int[][] puzzle = generatePuzzle(difficulty);
 
-        // Initialize all the 9x9 cells, based on the puzzle.
-        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
-            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
-                cells[row][col].newGame(puzzle.numbers[row][col], puzzle.isGiven[row][col]);
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                cells[row][col].setValue(puzzle[row][col]);
+                cells[row][col].setEditable(puzzle[row][col] == 0);
             }
         }
     }
 
     /**
-     * Return true if the puzzle is solved
-     * i.e., none of the cell have status of TO_GUESS or WRONG_GUESS
+     * Mendapatkan cell tertentu berdasarkan baris dan kolom
+     * @param row indeks baris
+     * @param col indeks kolom
+     * @return Cell yang diminta
      */
-    public boolean isSolved() {
-        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
-            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
-                if (cells[row][col].status == CellStatus.TO_GUESS || cells[row][col].status == CellStatus.WRONG_GUESS) {
-                    return false;
-                }
-            }
+    public Cell getCell(int row, int col) {
+        if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
+            return cells[row][col];
         }
-        return true;
+        throw new IndexOutOfBoundsException("Invalid cell coordinates: " + row + ", " + col);
     }
 
-    // [TODO 2] Define a Listener Inner Class for all the editable Cells
-    // .........
-    private class CellInputListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Get a reference of the JTextField that triggers this action event
-            Cell sourceCell = (Cell)e.getSource();
-
-            // Retrieve the int entered
-            int numberIn = Integer.parseInt(sourceCell.getText());
-            // For debugging
-            System.out.println("You entered " + numberIn);
-
-            /*
-             * [TODO 5] (later - after TODO 3 and 4)
-             * Check the numberIn against sourceCell.number.
-             * Update the cell status sourceCell.status,
-             * and re-paint the cell via sourceCell.paint().
-             */
-            if (numberIn == sourceCell.number) {
-                sourceCell.status = CellStatus.CORRECT_GUESS;
-            } else {
-                sourceCell.status = CellStatus.WRONG_GUESS;
-            }
-            sourceCell.paint();   // re-paint this cell based on its status
-
-            /*
-             * [TODO 6] (later)
-             * Check if the player has solved the puzzle after this move,
-             *   by calling isSolved(). Put up a congratulation JOptionPane, if so.
-             */
-            if(isSolved())JOptionPane.showMessageDialog(null, "Congratulation!");
+    /**
+     * Generate puzzle awal berdasarkan tingkat kesulitan
+     * @param difficulty tingkat kesulitan
+     * @return Array 2D berisi angka-angka puzzle
+     */
+    private int[][] generatePuzzle(String difficulty) {
+        // Mockup puzzle untuk berbagai tingkat kesulitan
+        // Implementasikan generator atau gunakan library jika diperlukan
+        if ("easy".equalsIgnoreCase(difficulty)) {
+            return new int[][]{
+                    {5, 3, 0, 0, 7, 0, 0, 0, 0},
+                    {6, 0, 0, 1, 9, 5, 0, 0, 0},
+                    {0, 9, 8, 0, 0, 0, 0, 6, 0},
+                    {8, 0, 0, 0, 6, 0, 0, 0, 3},
+                    {4, 0, 0, 8, 0, 3, 0, 0, 1},
+                    {7, 0, 0, 0, 2, 0, 0, 0, 6},
+                    {0, 6, 0, 0, 0, 0, 2, 8, 0},
+                    {0, 0, 0, 4, 1, 9, 0, 0, 5},
+                    {0, 0, 0, 0, 8, 0, 0, 7, 9}
+            };
+        } else if ("medium".equalsIgnoreCase(difficulty)) {
+            return new int[][]{
+                    {0, 0, 0, 6, 0, 0, 4, 0, 0},
+                    {7, 0, 0, 0, 0, 3, 6, 0, 0},
+                    {0, 0, 0, 0, 9, 1, 0, 8, 0},
+                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                    {0, 5, 0, 1, 8, 0, 0, 0, 3},
+                    {0, 0, 0, 3, 0, 6, 0, 4, 5},
+                    {0, 4, 0, 2, 0, 0, 0, 6, 0},
+                    {9, 0, 3, 0, 0, 0, 0, 0, 0},
+                    {0, 2, 0, 0, 0, 0, 1, 0, 0}
+            };
+        } else if ("hard".equalsIgnoreCase(difficulty)) {
+            return new int[][]{
+                    {0, 0, 0, 0, 0, 0, 0, 0, 0},
+                    {0, 0, 0, 0, 0, 3, 0, 8, 5},
+                    {0, 0, 1, 0, 2, 0, 0, 0, 0},
+                    {0, 0, 0, 5, 0, 7, 0, 0, 0},
+                    {0, 0, 4, 0, 0, 0, 1, 0, 0},
+                    {0, 9, 0, 0, 0, 0, 0, 0, 0},
+                    {5, 0, 0, 0, 0, 0, 0, 7, 3},
+                    {0, 0, 2, 0, 1, 0, 0, 0, 0},
+                    {0, 0, 0, 0, 4, 0, 0, 0, 9}
+            };
         }
+        throw new IllegalArgumentException("Invalid difficulty level: " + difficulty);
     }
 }

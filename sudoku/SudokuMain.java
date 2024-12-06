@@ -10,49 +10,58 @@
 
 // job to be done button reset, yg bolong banyakin aka random, difficulty, timer, status bar (number off cells remaining), Sound Effect Oiiiaoiia waktu menang
 package sudoku;
-import java.awt.*;
+
 import javax.swing.*;
-/**
- * The main Sudoku program
- */
-public class SudokuMain extends JFrame {
-    private static final long serialVersionUID = 1L;  // to prevent serial warning
+import java.awt.*;
 
-    // private variables
-    GameBoardPanel board = new GameBoardPanel();
-    SudokuExtras extras = new SudokuExtras(this);
+public class SudokuMain {
 
-    JButton btnNewGame = new JButton("New Game");
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Sudoku Game");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    // Constructor
-    public SudokuMain() {
-        Container cp = getContentPane();
-        cp.setLayout(new BorderLayout());
+            // Main panel dengan BorderLayout
+            JPanel mainPanel = new JPanel(new BorderLayout());
 
-        cp.add(board, BorderLayout.CENTER);
+            // Panel untuk papan permainan
+            GameBoardPanel gameBoardPanel = new GameBoardPanel();
+            mainPanel.add(gameBoardPanel, BorderLayout.CENTER);
 
-        // Add a button to the south to re-start the game via board.newGame()
-        // ......
+            // Panel untuk elemen tambahan (bisa tombol atau label)
+            JPanel extrasPanel = new JPanel();
+            extrasPanel.setLayout(new FlowLayout());
 
-        // Initialize the game board to start the game
-        board.newGame();
+            // Tombol tambahan untuk restart atau bantuan
+            JButton newGameButton = new JButton("New Game");
+            JButton solveButton = new JButton("Solve");
+            JComboBox<String> difficultyComboBox = new JComboBox<>(new String[]{"Easy", "Medium", "Hard"});
 
-        pack();     // Pack the UI components, instead of using setSize()
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // to handle window-closing
-        setTitle("Sudoku");
-        setVisible(true);
-    }
+            extrasPanel.add(new JLabel("Difficulty:"));
+            extrasPanel.add(difficultyComboBox);
+            extrasPanel.add(newGameButton);
+            extrasPanel.add(solveButton);
 
-    /** The entry main() entry method */
-        public static void main(String[] args) {
-            // [TODO 1] Check "Swing program template" on how to run
-            //  the constructor of "SudokuMain"
-            // .........
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    new SudokuMain();
-                }
+            // Menambahkan extrasPanel di bagian bawah (SOUTH)
+            mainPanel.add(extrasPanel, BorderLayout.SOUTH);
+
+            // Menambahkan listener untuk tombol new game
+            newGameButton.addActionListener(e -> {
+                String selectedDifficulty = (String) difficultyComboBox.getSelectedItem();
+                gameBoardPanel.newGame(selectedDifficulty);
             });
-        }
+
+            // Menambahkan listener untuk tombol solve (placeholder)
+            solveButton.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Solve functionality not implemented yet."));
+
+            // Menambahkan main panel ke frame
+            frame.add(mainPanel);
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+
+            // Inisialisasi dengan permainan baru
+            gameBoardPanel.newGame("Easy");
+        });
+    }
 }

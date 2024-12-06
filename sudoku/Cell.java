@@ -9,9 +9,11 @@
  */
 
 package sudoku;
+
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JTextField;
+
 /**
  * The Cell class model the cells of the Sudoku puzzle, by customizing (subclass)
  * the javax.swing.JTextField to include row/column, puzzle number and status.
@@ -73,5 +75,20 @@ public class Cell extends JTextField {
         } else if (status == CellStatus.WRONG_GUESS) {    // from TO_GUESS
             super.setBackground(BG_WRONG_GUESS);
         }
+    }
+
+    /**
+     * Set the value of the cell.
+     * @param value The value to set (0 for empty).
+     */
+    public void setValue(int value) {
+        this.number = value;
+        if (value == 0) {
+            setText(""); // Display empty if value is 0
+        } else {
+            setText(String.valueOf(value));
+        }
+        setEditable(status != CellStatus.GIVEN);
+        paint(); // Repaint cell after setting the value
     }
 }
