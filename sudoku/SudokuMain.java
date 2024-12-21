@@ -28,6 +28,18 @@ public class SudokuMain {
             GameBoardPanel gameBoardPanel = new GameBoardPanel();
             mainPanel.add(gameBoardPanel, BorderLayout.CENTER);
 
+            // Panel untuk pause
+            JLayeredPane layeredPane = new JLayeredPane();
+            layeredPane.setPreferredSize(new Dimension(600, 600));
+            gameBoardPanel.setBounds(0, 0, 600, 600);
+            layeredPane.add(gameBoardPanel, JLayeredPane.DEFAULT_LAYER);
+            JPanel overlayPanel = new JPanel();
+            overlayPanel.setBackground(new Color(100, 100, 100, 128));
+            overlayPanel.setBounds(0, 0, 600, 600);
+            overlayPanel.setVisible(false); // Initially hidden //NEW
+            layeredPane.add(overlayPanel, JLayeredPane.PALETTE_LAYER);
+            mainPanel.add(layeredPane, BorderLayout.CENTER);
+
             // Panel untuk elemen tambahan (bisa tombol atau label)
             JPanel extrasPanel = new JPanel();
             extrasPanel.setLayout(new FlowLayout());
@@ -53,6 +65,7 @@ public class SudokuMain {
             extrasPanel.add(timerLabel);
             extrasPanel.add(progressBar);
 
+
             // Menambahkan extrasPanel di bagian bawah (SOUTH)
             mainPanel.add(extrasPanel, BorderLayout.SOUTH);
 
@@ -62,6 +75,7 @@ public class SudokuMain {
                 gameBoardPanel.newGame(selectedDifficulty);
                 gameBoardPanel.startTimer(timerLabel);
                 gameBoardPanel.updateProgress(progressBar);
+                overlayPanel.setVisible(false);
                 Audio.MUSIC.stop();
                 Audio.MUSIC.music();
             });
@@ -74,10 +88,13 @@ public class SudokuMain {
                 if (gameBoardPanel.isTimerOn()) {
                     gameBoardPanel.pauseTimer();
                     pauseButton.setText("Resume");
+                    overlayPanel.setVisible(true);
+
                     Audio.CLICK.play();
                 } else {
                     gameBoardPanel.resumeTimer();
                     pauseButton.setText("Pause");
+                    overlayPanel.setVisible(false);
                     Audio.CLICK.play();
                 }
             });
